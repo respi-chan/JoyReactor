@@ -4,15 +4,17 @@ import ios.foundation.NSIndexPath
 import ios.uikit.UITableView
 import ios.uikit.UITableViewCell
 import ios.uikit.protocol.UITableViewDataSource
+import y2k.joyreactor.common.ServiceLocator
 import y2k.joyreactor.generated.PostListViewController
+import y2k.joyreactor.services.LifeCycleService
 
 /**
  * Created by y2k on 5/11/16.
  */
 class PostListController(val controller: PostListViewController) {
 
-//    // FIXME:
-//    val lifeCycle = ServiceLocator.resolve<LifeCycleService>()
+    // FIXME:
+    val lifeCycle = ServiceLocator.resolve<LifeCycleService>()
 
     init {
         controller.apply {
@@ -48,7 +50,5 @@ class PostListController(val controller: PostListViewController) {
         //
         //        // FIXME:
         //        lifeCycle.activate()
-
-
     }
 }
