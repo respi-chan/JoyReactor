@@ -1,2 +1,3 @@
-include ':core', ':android', ':ios'
+include ':core', ':android'
 
+include ':ios'
