@@ -31,6 +31,8 @@ class PostListController(controller: PostListViewController) {
                         // FIXME:
                         userName.setText(it.userName)
                         ratingView.setText("" + it.rating)
+                        replyCountView.setText("" + it.commentCount)
+
                         image.setImageLink(it.image)
                     }
                     item<UITableViewCell>({ it == null }, "LoadMore") {

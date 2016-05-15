@@ -45,7 +45,7 @@ public class PostCell extends UITableViewCell {
 
     @Selector("replyCountView")
     @Property
-    public native UIButton getReplyCountView();
+    public native UILabel getReplyCountView();
 
     @Selector("root")
     @Property
