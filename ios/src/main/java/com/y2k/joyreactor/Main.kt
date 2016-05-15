@@ -11,7 +11,7 @@ import ios.uikit.c.UIKit
 import ios.uikit.protocol.UIApplicationDelegate
 import y2k.joyreactor.common.ServiceLocator
 import y2k.joyreactor.common.platform.IosPlatform
-import y2k.joyreactor.platform.Platform
+import y2k.joyreactor.common.platform.Platform
 
 @RegisterOnStartup
 class Main(peer: Pointer) : NSObject(peer), UIApplicationDelegate {

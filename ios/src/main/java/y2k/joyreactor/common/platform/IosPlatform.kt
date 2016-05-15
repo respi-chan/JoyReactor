@@ -7,11 +7,10 @@ import ios.c.Globals
 import ios.foundation.c.Foundation
 import ios.foundation.enums.NSSearchPathDirectory
 import ios.foundation.enums.NSSearchPathDomainMask
+import ios.uikit.UIImage
 import rx.Observable
 import rx.schedulers.Schedulers
 import y2k.joyreactor.common.ForegroundScheduler
-import y2k.joyreactor.platform.NavigationService
-import y2k.joyreactor.platform.Platform
 import java.io.File
 
 /**
@@ -23,6 +22,11 @@ class IosPlatform : Platform {
         ForegroundScheduler.instance = Schedulers.from { action ->
             Globals.dispatch_async(Globals.dispatch_get_main_queue()) { action.run() }
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> decodeImage(path: File): T {
+        return UIImage.imageWithContentsOfFile(path.absolutePath) as T
     }
 
     override val currentDirectory: File

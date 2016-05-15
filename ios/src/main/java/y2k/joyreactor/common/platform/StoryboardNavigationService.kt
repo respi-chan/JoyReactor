@@ -1,6 +1,5 @@
 package y2k.joyreactor.common.platform
 
-import y2k.joyreactor.platform.NavigationService
 import kotlin.reflect.KClass
 
 /**
