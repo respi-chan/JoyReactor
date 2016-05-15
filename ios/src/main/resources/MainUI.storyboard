@@ -211,7 +211,12 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Featured" id="qYq-I1-f0l">
-                        <barButtonItem key="rightBarButtonItem" image="More.png" id="6jA-Xo-lkf"/>
+                        <barButtonItem key="leftBarButtonItem" image="MenuIcon.png" id="DQA-h4-85T">
+                            <connections>
+                                <action selector="onMenuButtonClicked:" destination="VWA-YG-Sf3" id="Adk-nP-Ty0"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="6jA-Xo-lkf"/>
                     </navigationItem>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
@@ -371,6 +376,6 @@
     <resources>
         <image name="IconThumbUp.png" width="25" height="25"/>
         <image name="MenuHeader.png" width="270" height="136"/>
-        <image name="More.png" width="20" height="6"/>
+        <image name="MenuIcon.png" width="24" height="24"/>
     </resources>
 </document>

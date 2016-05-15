@@ -3,6 +3,7 @@ package y2k.joyreactor
 import ios.uikit.UITableViewCell
 import y2k.joyreactor.common.BindingBuilder
 import y2k.joyreactor.common.ServiceLocator
+import y2k.joyreactor.common.SideMenu
 import y2k.joyreactor.common.setImageLink
 import y2k.joyreactor.generated.PostCell
 import y2k.joyreactor.generated.PostListViewController
@@ -19,11 +20,11 @@ class PostListController(controller: PostListViewController) {
 
     init {
         controller.apply {
+            SideMenu(this, "Menu").attach()
+
             val vm = ServiceLocator.resolve<PostListViewModel>(lifeCycle)
             BindingBuilder {
-
                 activityIndicator(progressView, vm.isBusy)
-
                 tableView(list, vm.posts) {
                     item<PostCell>({ it != null }, "Post") {
                         if (it == null) return@item
@@ -39,7 +40,6 @@ class PostListController(controller: PostListViewController) {
                         // FIXME:
                     }
                 }
-
             }
         }
 

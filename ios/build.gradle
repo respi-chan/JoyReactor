@@ -44,7 +44,7 @@ test { exclude '**' }
 moe {
     xcode.mainTarget = 'joyreactor'
     xcode.testTarget = 'joyreactor-Test'
-    xcode.packageName = 'com.y2k.joyreactor'
+    xcode.packageName = 'y2k.joyreactor'
     xcode.launchScreenFilePath = 'src/main/resources/LaunchScreen.xib'
     xcode.bundleID = 'y2k.joyreactor'
 

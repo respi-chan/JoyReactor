@@ -12,7 +12,7 @@ import y2k.joyreactor.services.LinksPool
 
 fun UIImageView.setImageLink(image: Image?) {
     val imageService = ServiceLocator.resolve<ImageService>()
-    val url = imageService.makeUrl(image, 200, 200)
+    val url = imageService.makeUrl(image, 100, 100)
 
     println("REQUEST | " + url)
     imageService

@@ -1,4 +1,4 @@
-package com.y2k.joyreactor
+package y2k.joyreactor
 
 import com.intel.moe.natj.general.Pointer
 import com.intel.moe.natj.general.ann.RegisterOnStartup

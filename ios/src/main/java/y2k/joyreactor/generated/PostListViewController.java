@@ -10,6 +10,7 @@ import com.intel.moe.natj.objc.ann.ObjCClassName;
 import com.intel.moe.natj.objc.ann.Property;
 import com.intel.moe.natj.objc.ann.Selector;
 
+import ios.NSObject;
 import ios.uikit.UIActivityIndicatorView;
 import ios.uikit.UIButton;
 import ios.uikit.UITableView;
@@ -37,6 +38,11 @@ public class PostListViewController extends UIViewController {
     @Selector("applyButton")
     @Property
     public native UIButton getApplyButton();
+
+    @Selector("onMenuButtonClicked:")
+    public void onMenuButtonClicked(NSObject sender) {
+        //
+    }
 
     @Selector("viewDidLoad")
     @Override
