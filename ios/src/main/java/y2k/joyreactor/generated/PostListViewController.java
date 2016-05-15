@@ -10,8 +10,8 @@ import com.intel.moe.natj.objc.ann.ObjCClassName;
 import com.intel.moe.natj.objc.ann.Property;
 import com.intel.moe.natj.objc.ann.Selector;
 
+import ios.uikit.UIActivityIndicatorView;
 import ios.uikit.UIButton;
-import ios.uikit.UIProgressView;
 import ios.uikit.UITableView;
 import ios.uikit.UIView;
 import ios.uikit.UIViewController;
@@ -24,7 +24,7 @@ public class PostListViewController extends UIViewController {
 
     @Selector("progressView")
     @Property
-    public native UIProgressView getProgressView();
+    public native UIActivityIndicatorView getProgressView();
 
     @Selector("list")
     @Property

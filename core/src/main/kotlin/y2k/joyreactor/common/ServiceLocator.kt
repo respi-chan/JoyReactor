@@ -32,6 +32,7 @@ object ServiceLocator {
         register { MessagesViewModel(resolve(), resolve()) }
 
         register { BroadcastService }
+        register { LifeCycleService(resolve()) }
 
         register { TokenRequest(resolve()) }
         register { LikePostRequest(resolve(), resolve()) }
