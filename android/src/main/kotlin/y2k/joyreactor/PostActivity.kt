@@ -7,18 +7,20 @@ import android.widget.TextView
 import y2k.joyreactor.common.*
 import y2k.joyreactor.model.Comment
 import y2k.joyreactor.viewmodel.PostViewModel
+import y2k.joyreactor.widget.WebImageView
 
 class PostActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
-        setSupportActionBar(find<Toolbar>(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val vm = ServiceLocator.resolve<PostViewModel>()
+        val vm = ServiceLocator.resolve<PostViewModel>(lifeCycleService)
         bindingBuilder(this) {
             viewResolver(R.id.list)
+
+            visibility(R.id.createComment, vm.canCreateComments)
+            command(R.id.createComment) { vm.commentPost() }
 
             progressImageView(R.id.poster, vm.poster)
             fixedAspectPanel(R.id.posterPanel, vm.posterAspect)
@@ -26,7 +28,7 @@ class PostActivity : BaseActivity() {
             tagsView(R.id.tags, vm.tags)
 
             // Image panel
-            imagePanel(R.id.images, vm.images)
+            imagePanel(R.id.images, vm.images) { vm.openImage(it) }
             visibility(R.id.showMoreImages, vm.images, { it.size > 3 })
             visibility(R.id.imagePanel, vm.images, { it.isNotEmpty() })
             command(R.id.showMoreImages) { vm.showMoreImages() }
@@ -56,11 +58,12 @@ class PostActivity : BaseActivity() {
     class CommentViewHolder(parent: ViewGroup) :
         ListViewHolder<Comment>(parent.inflate(R.layout.item_comment)) {
 
-        val rating = itemView.find<TextView>(R.id.rating)
-        val text = itemView.find<TextView>(R.id.text)
-        val replies = itemView.find<TextView>(R.id.replies)
-        val avatar = itemView.find<WebImageView>(R.id.avatar)
-        val attachment = itemView.find<WebImageView>(R.id.attachment)
+        val rating by view<TextView>()
+        val text by view<TextView>()
+        val replies by view<TextView>()
+        val avatar by view<WebImageView>()
+        val attachment by view<WebImageView>()
+
         var lastComment: Comment? = null
 
         override fun update(item: Comment) {

@@ -17,14 +17,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.*
 import y2k.joyreactor.App
-import y2k.joyreactor.FixedAspectPanel
-import y2k.joyreactor.ImagePanel
-import y2k.joyreactor.WebImageView
 import y2k.joyreactor.model.Group
 import y2k.joyreactor.model.Image
-import y2k.joyreactor.widget.MuteVideoView
-import y2k.joyreactor.widget.ProgressImageView
-import y2k.joyreactor.widget.TagsView
+import y2k.joyreactor.widget.*
 import java.io.File
 
 /**
@@ -200,9 +195,9 @@ class BindingBuilder(root: ViewResolver, val context: Context = App.instance) {
         property.subscribe { view.aspect = it }
     }
 
-    fun progressImageView(id: Int, property: ObservableProperty<PartialResult<File>>) {
+    fun progressImageView(id: Int, property: ObservableProperty<File?>) {
         val view = find<ProgressImageView>(id)
-        property.subscribe { view.image = it }
+        property.subscribe { view.setImage(it) }
     }
 
     fun imageView(id: Int, property: ObservableProperty<File?>) {
@@ -215,9 +210,9 @@ class BindingBuilder(root: ViewResolver, val context: Context = App.instance) {
         property.subscribe { view.tags = it }
     }
 
-    fun imagePanel(id: Int, property: ObservableProperty<List<Image>>) {
+    fun imagePanel(id: Int, property: ObservableProperty<List<Image>>, f: (Image) -> Unit) {
         val view = find<ImagePanel>(id)
-        property.subscribe { view.setImages(it) }
+        property.subscribe { view.setImages(it, f) }
     }
 
     fun editText(id: Int, init: EditTextBinding.() -> Unit) {

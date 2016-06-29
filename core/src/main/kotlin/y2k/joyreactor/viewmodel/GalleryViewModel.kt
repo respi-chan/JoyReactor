@@ -1,6 +1,7 @@
 package y2k.joyreactor.viewmodel
 
-import y2k.joyreactor.common.await
+import y2k.joyreactor.common.platform.NavigationService
+import y2k.joyreactor.common.platform.open
 import y2k.joyreactor.common.property
 import y2k.joyreactor.model.Image
 import y2k.joyreactor.services.PostService
@@ -8,13 +9,18 @@ import y2k.joyreactor.services.PostService
 /**
  * Created by y2k on 3/8/16.
  */
-class GalleryViewModel(private val postService: PostService) {
+class GalleryViewModel(
+    private val navigation: NavigationService,
+    private val service: PostService) {
 
     val images = property(emptyList<Image>())
 
     init {
-        postService
-            .getPostImages()
-            .await { images += it }
+        images += service.getImages(navigation.argument.toLong())
+    }
+
+    fun openImage(index: Int) {
+        val imgUrl = images.value[index].fullUrl()
+        navigation.open<ImageViewModel>(imgUrl)
     }
 }

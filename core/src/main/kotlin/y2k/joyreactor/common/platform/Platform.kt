@@ -1,8 +1,9 @@
 package y2k.joyreactor.common.platform
 
 import com.j256.ormlite.support.ConnectionSource
-import rx.Observable
-
+import rx.Completable
+import rx.Single
+import y2k.joyreactor.services.ReportService
 import java.io.File
 
 /**
@@ -16,9 +17,13 @@ interface Platform {
 
     fun loadFromBundle(name: String, ext: String): ByteArray
 
-    fun saveToGallery(imageFile: File): Observable<*>
+    fun saveToGallery(imageFile: File): Completable
 
     fun buildConnection(file: File): ConnectionSource
 
     fun <T> decodeImage(path: File): T
+
+    fun makeReportService(): ReportService
+
+    fun createTmpThumbnail(videoFile: File): Single<File>
 }

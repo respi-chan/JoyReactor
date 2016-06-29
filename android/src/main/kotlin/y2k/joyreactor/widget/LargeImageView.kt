@@ -1,11 +1,11 @@
-package y2k.joyreactor
+package y2k.joyreactor.widget
 
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.AttributeSet
 import android.widget.ImageView
 import y2k.joyreactor.common.ioObservable
-import y2k.joyreactor.common.await
+import y2k.joyreactor.common.ui
 import java.io.File
 
 /**
@@ -33,7 +33,7 @@ class LargeImageView(context: Context, attrs: AttributeSet) :
                 op.outHeight / met.heightPixels)
 
             BitmapFactory.decodeFile(path.absolutePath, op)
-        }.await {
+        }.ui {
             setImageBitmap(it)
         }
     }

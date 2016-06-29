@@ -1,26 +1,16 @@
 package y2k.joyreactor.services
 
-import rx.Observable
-import y2k.joyreactor.common.ioObservable
-import y2k.joyreactor.services.requests.CreateCommentRequestFactory
-import y2k.joyreactor.services.requests.PostRequest
+import rx.Completable
 
 /**
  * Created by y2k on 04/12/15.
  */
 class CommentService(
-    private val requestFactory: CreateCommentRequestFactory,
-    private val postRequest: PostRequest,
-    private val postBuffer: MemoryBuffer) {
+    private val requestFactory: (Long, String) -> Completable,
+    private val postService: PostService) {
 
-    fun createComment(postId: String, commentText: String): Observable<Unit> {
-        return requestFactory
-            .create(postId, commentText)
-            .flatMap {
-                ioObservable {
-                    postRequest.request(postId);
-                    postBuffer.updatePost(postRequest)
-                }
-            }
+    fun createComment(postId: Long, commentText: String): Completable {
+        return requestFactory(postId, commentText)
+            .andThen(postService.synchronizePostWithImage(postId.toLong()))
     }
 }

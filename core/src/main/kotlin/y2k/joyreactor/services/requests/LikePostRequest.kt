@@ -3,9 +3,9 @@ package y2k.joyreactor.services.requests
 import org.jsoup.nodes.Document
 import rx.Observable
 import y2k.joyreactor.common.ajax
-import y2k.joyreactor.common.buildRequest
 import y2k.joyreactor.common.http.HttpClient
 import y2k.joyreactor.model.MyLike
+import y2k.joyreactor.services.requests.parser.LikeParser
 
 /**
  * Created by y2k on 4/24/16.
@@ -21,7 +21,7 @@ class LikePostRequest(
     private val httpClient: HttpClient,
     private val tokenRequest: TokenRequest) {
 
-    fun like(id: Long, like: Boolean): Observable<Pair<Float, MyLike>> {
+    operator fun invoke(id: Long, like: Boolean): Observable<Pair<Float, MyLike>> {
         return tokenRequest
             .request()
             .map {
@@ -44,6 +44,6 @@ class LikePostRequest(
     }
 
     private fun getMyLike(document: Document): MyLike {
-        return PostsForTagRequest.LikeParser(document.body()).myLike
+        return LikeParser(document.body()).myLike
     }
 }

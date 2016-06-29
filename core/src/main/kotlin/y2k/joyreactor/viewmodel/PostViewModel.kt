@@ -1,15 +1,14 @@
 package y2k.joyreactor.viewmodel
 
-import y2k.joyreactor.common.PartialResult
-import y2k.joyreactor.common.await
-import y2k.joyreactor.common.property
-import y2k.joyreactor.model.Comment
-import y2k.joyreactor.model.CommentGroup
-import y2k.joyreactor.model.EmptyGroup
-import y2k.joyreactor.model.Image
+import y2k.joyreactor.common.Notifications
+import y2k.joyreactor.common.pack
 import y2k.joyreactor.common.platform.NavigationService
-import y2k.joyreactor.common.platform.Platform
 import y2k.joyreactor.common.platform.open
+import y2k.joyreactor.common.property
+import y2k.joyreactor.common.ui
+import y2k.joyreactor.model.Comment
+import y2k.joyreactor.model.Image
+import y2k.joyreactor.services.LifeCycleService
 import y2k.joyreactor.services.PostService
 import y2k.joyreactor.services.ProfileService
 import java.io.File
@@ -20,74 +19,51 @@ import java.io.File
 class PostViewModel(
     private val service: PostService,
     private val userService: ProfileService,
-    private val navigation: NavigationService) {
+    private val navigation: NavigationService,
+    private val scope: LifeCycleService) {
 
-    val isBusy = property(false)
-    val comments = property<CommentGroup>(EmptyGroup())
+    val isBusy = property(true)
+    val error = property(false)
+    val canCreateComments = property(false)
+
     val description = property("")
-
-    val poster = property(PartialResult.inProgress<File>(0, 100))
+    val poster = property<File>()
     val posterAspect = property(1f)
 
     val tags = property(emptyList<String>())
-
     val images = property(emptyList<Image>())
+    val comments = property(emptyList<Comment>())
 
-    val error = property(false)
+    private val postId = navigation.argument.toLong()
 
     init {
-        isBusy += true
-        service
-            .synchronizePostAsync(navigation.argument)
-            .await({ post ->
-                posterAspect += post.image?.aspect ?: 1f
-                service.getPostImages().await { images += it }
+        val process = service.synchronizePostWithImage(postId).pack()
+        scope(Notifications.Post) {
+            isBusy += process.isBusy
+            error += process.finishedWithError
 
-                description += post.title
-                tags += post.tags
+            poster += service.mainImageFromDisk(postId)
+            images += service.getImages(postId)
+            comments += service.getTopComments(postId, 10)
+            canCreateComments += userService.isAuthorized()
 
-                service
-                    .getCommentsAsync(post.id, 0)
-                    .await {
-                        comments += it
-                        isBusy += false
-                    }
-
-                service
-                    .mainImagePartial(post.id)
-                    .await { poster += it }
-
-                //                userService
-                //                    .isAuthorized()
-                //                    .subscribeOnMain { if (it) view.setEnableCreateComments() }
-            }, {
-                it.printStackTrace()
-                error += true
-            })
+            service.getPost(postId).ui {
+                posterAspect += it.imageAspectOrDefault(1f)
+                description += it.title
+                tags += it.tags
+            }
+        }
     }
 
-    fun showMoreImages() {
-        navigation.open<GalleryViewModel>()
-    }
+    fun openInBrowser() = navigation.openBrowser("http://joyreactor.cc/post/" + postId)
+    fun commentPost() = navigation.open<CreateCommentViewModel>(postId)
+    fun showMoreImages() = navigation.open<GalleryViewModel>(postId)
+    fun openImage(image: Image) = navigation.open<ImageViewModel>(image.fullUrl())
 
     fun saveToGallery() {
         isBusy += true
-        service
-            .saveImageToGallery(navigation.argument.toLong())
-            .await { isBusy += false }
+        service.saveImageToGallery(postId).ui { isBusy += false }
     }
 
-    fun openInBrowser() {
-        navigation.openBrowser("http://joyreactor.cc/post/" + navigation.argument)
-    }
-
-    fun selectComment(position: Int) {
-        TODO()
-    }
-
-    fun selectComment(comment: Comment) {
-        service
-            .getCommentsAsync(comment.postId, comments.value.getNavigation(comment))
-            .await { comments += it }
-    }
+    fun selectComment(comment: Comment) = navigation.open<CommentsViewModel>(comment.id)
 }

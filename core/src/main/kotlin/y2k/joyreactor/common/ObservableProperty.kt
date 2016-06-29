@@ -1,6 +1,6 @@
 package y2k.joyreactor.common
 
-import rx.Observable
+import rx.Single
 import rx.Subscription
 import rx.subjects.PublishSubject
 import rx.subjects.Subject
@@ -24,6 +24,8 @@ class ObservableProperty<T>(initValue: T) {
         this.value = value
     }
 
+    operator fun plusAssign(single: Single<T>) = single.ui { value = it }
+
     fun subscribe(f: (T) -> Unit) {
         subject.subscribe(f)
         f(value)
@@ -41,10 +43,6 @@ class ObservableProperty<T>(initValue: T) {
 
     fun unsubscribe(target: ObservableProperty<T>) {
         targetMap.remove(target)?.unsubscribe()
-    }
-
-    fun asObservable(): Observable<T> {
-        return subject;
     }
 }
 

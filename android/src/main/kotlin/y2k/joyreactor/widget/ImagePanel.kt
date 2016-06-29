@@ -1,9 +1,11 @@
-package y2k.joyreactor
+package y2k.joyreactor.widget
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import y2k.joyreactor.R
+import y2k.joyreactor.widget.WebImageView
 import y2k.joyreactor.common.forEachChild
 import y2k.joyreactor.common.inflateToSelf
 import y2k.joyreactor.common.isVisible
@@ -29,9 +31,12 @@ class ImagePanel(context: Context, attrs: AttributeSet) : FrameLayout(context, a
         }
     }
 
-    fun setImages(images: List<Image>) {
-        for (i in 0..Math.min(images.size, imageViews.size) - 1)
-            imageViews[i].image = images[i]
+    fun setImages(images: List<Image>, f: (Image) -> Unit) {
+        for (i in 0..Math.min(images.size, imageViews.size) - 1) {
+            val imageView = imageViews[i]
+            imageView.image = images[i]
+            imageView.setOnClickListener { f(imageView.image!!) }
+        }
         imageViews.forEachIndexed { i, view -> view.isVisible = i < images.size }
     }
 }

@@ -1,7 +1,7 @@
 package y2k.joyreactor.model
 
-import rx.Observable
-import y2k.joyreactor.services.MemoryBuffer
+import rx.Single
+import y2k.joyreactor.services.repository.Entities
 import java.util.*
 
 /**
@@ -27,26 +27,25 @@ class RootComments() : ArrayList<Comment>(), CommentGroup {
 
     companion object {
 
-        fun create(buffer: MemoryBuffer, postId: Long): Observable<CommentGroup> {
-            val firstLevelComments = HashSet<Long>()
-            val comments = buffer.comments
-                .filter { it.postId == postId }
-                .filter {
-                    if (it.parentId == 0L) {
-                        firstLevelComments.add(it.id)
-                        true
-                    } else {
-                        firstLevelComments.contains(it.parentId)
+        fun create(entities: Entities, postId: Long): Single<CommentGroup> {
+            return entities.useOnce {
+                val firstLevelComments = HashSet<Long>()
+                val comments = comments
+                    .filter("postId" to postId)
+                    .filter { it.postId == postId }
+                    .filter {
+                        if (it.parentId == 0L) {
+                            firstLevelComments.add(it.id)
+                            true
+                        } else {
+                            firstLevelComments.contains(it.parentId)
+                        }
                     }
-                }
-                .toList()
+                    .map { it.copy(level = if (firstLevelComments.contains(it.parentId)) 1 else 0) }
+                    .toList()
 
-            // TODO: убрать мутабельность
-            comments
-                .filter { firstLevelComments.contains(it.parentId) }
-                .forEach { it.level = 1 }
-
-            return Observable.just(RootComments().apply { addAll(comments) })
+                RootComments().apply { addAll(comments) }
+            }
         }
     }
 }
@@ -59,20 +58,24 @@ class ChildComments() : ArrayList<Comment>(), CommentGroup {
 
     companion object {
 
-        fun create(buffer: MemoryBuffer, parentCommentId: Long): Observable<CommentGroup> {
-            val parent = buffer.comments.first { it.id == parentCommentId }
-            val children = buffer.comments
-                .filter { it.parentId == parentCommentId }
-                .toList()
+        fun create(entities: Entities, parentCommentId: Long, postId: Long): Single<CommentGroup> {
+            return entities.useOnce {
+                val parent = comments
+                    .filter("postId" to postId)
+                    .first { it.id == parentCommentId }
+                    .copy(level = 0)
 
-            // TODO: убрать мутабельность
-            parent.level = 0
-            children.forEach { it.level = 1 }
+                val children = comments
+                    .filter("postId" to postId)
+                    .filter { it.parentId == parentCommentId }
+                    .map { it.copy(level = 1) }
+                    .toList()
 
-            return Observable.just(ChildComments().apply {
-                this.add(parent) // TODO: разобраться почему не работает без this.
-                addAll(children)
-            })
+                ChildComments().apply {
+                    this.add(parent) // TODO: разобраться почему не работает без this.
+                    addAll(children)
+                }
+            }
         }
     }
 }

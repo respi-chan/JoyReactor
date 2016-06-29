@@ -1,9 +1,9 @@
 package y2k.joyreactor.viewmodel
 
-import y2k.joyreactor.common.await
-import y2k.joyreactor.common.property
-import y2k.joyreactor.model.Image
 import y2k.joyreactor.common.platform.NavigationService
+import y2k.joyreactor.common.property
+import y2k.joyreactor.common.ui
+import y2k.joyreactor.model.Image
 import y2k.joyreactor.services.CommentService
 import y2k.joyreactor.services.ProfileService
 
@@ -13,7 +13,7 @@ import y2k.joyreactor.services.ProfileService
 class CreateCommentViewModel(
     private val profileService: ProfileService,
     private val service: CommentService,
-    private val navigationService: NavigationService) {
+    private val navigation: NavigationService) {
 
     val isBusy = property(false)
 
@@ -23,21 +23,17 @@ class CreateCommentViewModel(
     val commentText = property("")
 
     init {
-        profileService
-            .getProfile()
-            .await {
-                username += it.userName
-                avatar += it.userImage
-            }
+        profileService.getProfile().ui {
+            username += it.userName
+            avatar += it.userImage
+        }
     }
 
     fun create() {
         isBusy += true
-        service
-            .createComment("2219757", commentText.value) // FIXME:
-            .await {
-                navigationService.close()
-                isBusy += false
-            }
+        service.createComment(navigation.argument.toLong(), commentText.value).ui {
+            navigation.close()
+            isBusy += false
+        }
     }
 }

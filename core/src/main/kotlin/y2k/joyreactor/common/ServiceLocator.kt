@@ -4,10 +4,11 @@ import y2k.joyreactor.common.http.CookieStorage
 import y2k.joyreactor.common.http.DefaultHttpClient
 import y2k.joyreactor.common.http.HttpClient
 import y2k.joyreactor.common.platform.NavigationService
+import y2k.joyreactor.common.platform.Platform
 import y2k.joyreactor.services.*
 import y2k.joyreactor.services.images.DiskCache
 import y2k.joyreactor.services.images.MultiTryDownloader
-import y2k.joyreactor.services.repository.DataContext
+import y2k.joyreactor.services.repository.Entities
 import y2k.joyreactor.services.repository.IDataContext
 import y2k.joyreactor.services.repository.ormlite.OrmLiteDataContext
 import y2k.joyreactor.services.requests.*
@@ -27,53 +28,59 @@ object ServiceLocator {
 
     init {
         registerSingleton<HttpClient> { DefaultHttpClient(CookieStorage(resolve())) }
-        register { PostViewModel(resolve(), resolve(), resolve()) }
+        register { PostViewModel(resolve(), resolve(), resolve(), resolve()) }
         register { NavigationService.instance }
         register { ThreadsViewModel(resolve(), resolve(), resolve()) }
         register { MessagesViewModel(resolve(), resolve()) }
 
+        register { resolve<Platform>().makeReportService() }
         register { BroadcastService }
         register { LifeCycleService(resolve()) }
 
         register { TokenRequest(resolve()) }
+        register { ChangePostFavoriteRequest(resolve(), resolve()) }
         register { LikePostRequest(resolve(), resolve()) }
         register { MessageListRequest(resolve(), resolve()) }
         register { PostMerger(resolve(), resolve()) }
         register { MemoryBuffer }
         register { MyTagFetcher(resolve(), resolve(), resolve()) }
         register { PrivateMessageFetcher(resolve(), resolve()) }
-        register { PostsForTagRequest(resolve()) }
+        register { PostsForTagRequest(resolve(), resolve(), resolve()) }
         register { AddTagRequest(resolve()) }
         register { UserNameRequest(resolve()) }
         register { TagsForUserRequest(resolve(), resolve()) }
         register { OriginalImageRequestFactory(resolve(), resolve()) }
-        register { PostRequest(resolve()) }
+        register { PostRequest(resolve(), resolve()) }
         register { ProfileRequestFactory(resolve()) }
         register { LoginRequestFactory(resolve()) }
         register { SendMessageRequest(resolve()) }
+        register { CreateCommentRequest(resolve()) }
 
-        register { PostService(resolve(), resolve(), resolve(), resolve(), resolve(), resolve()) }
+        register { PostService(resolve(), resolve<PostRequest>(), resolve(), resolve(), resolve(), resolve(), resolve()) }
         register { TagService(resolve(), resolve(), resolve(), resolve()) }
         register { UserService(resolve(), resolve(), resolve(), resolve()) }
         register { ProfileService(resolve(), resolve(), resolve()) }
         register { UserMessagesService(resolve(), resolve(), resolve()) }
-        register { CommentService(resolve(), resolve(), resolve()) }
+        register { CommentService(resolve<CreateCommentRequest>(), resolve()) }
+
         register { LoginViewModel(resolve(), resolve()) }
         register { MenuViewModel(resolve(), resolve(), resolve()) }
-        register { GalleryViewModel(resolve()) }
-        register { ImageViewModel(resolve()) }
+        register { GalleryViewModel(resolve(), resolve()) }
+        register { ImageViewModel(resolve(), resolve()) }
         register { VideoViewModel(resolve(), resolve()) }
         register { ProfileViewModel(resolve(), resolve()) }
         register { AddTagViewModel(resolve(), resolve()) }
-        register { PostListViewModel(resolve(), resolve(), resolve(), resolve()) }
+        register { MainViewModel(resolve(), resolve(), resolve(), resolve(), resolve(), resolve()) }
         register { PostLikeViewModel(resolve(), resolve()) }
+        register { CreateCommentViewModel(resolve(), resolve(), resolve()) }
+        register { CommentsViewModel(resolve(), resolve(), resolve(), resolve()) }
 
         register { DiskCache(resolve()) }
         register { MultiTryDownloader(resolve()) }
         register { ImageService(resolve(), resolve(), resolve()) }
 
         registerSingleton<IDataContext> { OrmLiteDataContext(resolve()) }
-        register { DataContext.Factory(resolve()) }
+        register { Entities(resolve()) }
     }
 
     // ==========================================

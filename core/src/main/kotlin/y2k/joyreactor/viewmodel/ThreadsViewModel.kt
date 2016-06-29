@@ -1,10 +1,10 @@
 package y2k.joyreactor.viewmodel
 
-import y2k.joyreactor.common.await
-import y2k.joyreactor.common.property
-import y2k.joyreactor.model.Message
 import y2k.joyreactor.common.platform.NavigationService
 import y2k.joyreactor.common.platform.open
+import y2k.joyreactor.common.property
+import y2k.joyreactor.common.ui
+import y2k.joyreactor.model.Message
 import y2k.joyreactor.services.LifeCycleService
 import y2k.joyreactor.services.UserMessagesService
 
@@ -28,7 +28,7 @@ class ThreadsViewModel(
         var isWeb = false // TODO: переделать
         service
             .getThreads()
-            .await {
+            .ui {
                 threads += it
 
                 if (isWeb) isBusy += false

@@ -7,22 +7,18 @@ import rx.Subscription
 import rx.schedulers.Schedulers
 import y2k.joyreactor.services.LifeCycleService
 import y2k.joyreactor.services.repository.DataContext
+import y2k.joyreactor.services.repository.Entities
 
 /**
  * Created by y2k on 1/31/16.
  */
 
-inline fun <T, R> Observable<T>.mapDatabase(context: DataContext.Factory, crossinline f: DataContext.(T) -> R): Observable<R> {
-    return flatMap { data ->
-        context.applyUse { f(data) }
-    }
+inline fun <T, R> Observable<T>.mapEntities(context: Entities, crossinline f: DataContext.(T) -> R): Observable<R> {
+    return flatMap { data -> context.use { f(data) } }
 }
 
-fun <T> Single<T>.replaceIfNull(f: () -> Single<T>): Single<T> {
-    return flatMap {
-        if (it != null) Single.just<T>(it)
-        else f()
-    }
+inline fun <T, R> Observable<T>.doEntities(context: Entities, crossinline f: DataContext.(T) -> R): Completable {
+    return flatMap { data -> context.use { f(data) } }.toCompletable()
 }
 
 fun <T> Observable<T>.replaceIfNull(f: () -> Observable<T>): Observable<T> {
@@ -30,14 +26,6 @@ fun <T> Observable<T>.replaceIfNull(f: () -> Observable<T>): Observable<T> {
         if (it != null) Observable.just<T>(it)
         else f()
     }
-}
-
-fun <T> Single<T>.toCompletable(): Completable {
-    return Completable.fromSingle(this)
-}
-
-fun <T> Completable.andThen(single: Single<T>): Single<T> {
-    return andThen(single.toObservable()).toSingle()
 }
 
 inline fun <T> Single<T>.subscribe(crossinline f: (T?, Throwable?) -> Unit): Subscription {
@@ -48,23 +36,29 @@ inline fun <T> Observable<T>.subscribe(crossinline f: (T?, Throwable?) -> Unit):
     return subscribe({ f(it, null) }, { f(null, it) })
 }
 
-fun <T> Observable<T>.peek(func: (T) -> Unit): Observable<T> {
-    return map {
-        func(it);
-        it
-    }
-}
-
-inline fun <T, R> Observable<T?>.mapNotNull(crossinline f: (T) -> R): Observable<R?> {
-    return map { it?.let(f) }
-}
-
 inline fun <T, R> Single<T?>.mapNotNull(crossinline f: (T) -> R): Single<R?> {
     return map { it?.let(f) }
 }
 
 fun ioUnitObservable(func: () -> Unit): Observable<Unit> {
     return ioObservable(func)
+}
+
+fun <T> Single<T>.andThen(f: (T) -> Completable): Completable {
+    return toObservable().flatMap { f(it).toObservable<T>() }.toCompletable()
+}
+
+fun ioCompletable(func: () -> Unit): Completable {
+    return Completable.create {
+        Schedulers.io().createWorker().schedule {
+            try {
+                func()
+                it.onCompleted()
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+        }
+    }
 }
 
 fun <T> ioObservable(func: () -> T): Observable<T> {
@@ -80,30 +74,71 @@ fun <T> ioObservable(func: () -> T): Observable<T> {
     }
 }
 
+fun <T> ioSingle(func: () -> T): Single<T> {
+    return Single.create {
+        Schedulers.io().createWorker().schedule {
+            try {
+                it.onSuccess(func())
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+        }
+    }
+}
+
 fun <T, R> Observable<T>.concatAndRepeat(other: Observable<R>): Observable<T> {
     return concatWith(other.flatMap { this })
 }
 
-fun Completable.await(onComplete: () -> Unit, onError: (Throwable) -> Unit): Subscription {
+fun Completable.ui(onComplete: () -> Unit, onError: (Throwable) -> Unit): Subscription {
     return observeOn(ForegroundScheduler.instance).subscribe(onError, onComplete)
 }
 
-fun Completable.await(onComplete: () -> Unit): Subscription {
+fun Completable.ui(onComplete: () -> Unit): Subscription {
     return observeOn(ForegroundScheduler.instance).subscribe({ it.printStackTrace() }, onComplete)
 }
 
-fun <T> Observable<T>.await(onNext: (T) -> Unit, onError: (Throwable) -> Unit): Subscription {
+fun <T> Observable<T>.ui(onNext: (T) -> Unit, onError: (Throwable) -> Unit): Subscription {
     return observeOn(ForegroundScheduler.instance).subscribe(onNext, onError)
 }
 
-fun <T> Observable<T>.await(onNext: (T) -> Unit): Subscription {
+fun <T> Observable<T>.ui(onNext: (T) -> Unit): Subscription {
     return observeOn(ForegroundScheduler.instance).subscribe(onNext, { it.printStackTrace() })
 }
 
 fun <T> Pair<Single<T>, Notifications>.subscribe(lifeCycle: LifeCycleService, onNext: (T) -> Unit) {
-    lifeCycle.register(second) {
+    lifeCycle.scope(second) {
         first
             .observeOn(ForegroundScheduler.instance)
             .subscribe(onNext, Throwable::printStackTrace)
+    }
+}
+
+fun <T> Single<T>.ui(onSuccess: (T) -> Unit, onFail: (Throwable) -> Unit) {
+    observeOn(ForegroundScheduler.instance)
+        .subscribe(onSuccess, onFail)
+}
+
+fun <T> Single<T>.ui(onSuccess: (T) -> Unit) {
+    observeOn(ForegroundScheduler.instance)
+        .subscribe(onSuccess, { it.printStackTrace() })
+}
+
+fun Completable.pack() = PackedCompletable(this)
+
+class PackedCompletable(completable: Completable) {
+
+    @Volatile var isBusy: Boolean = true
+    @Volatile var finishedWithError: Boolean = false
+
+    init {
+        completable
+            .doOnCompleted { isBusy = false }
+            .doOnError {
+                it.printStackTrace()
+                isBusy = false
+                finishedWithError = true
+            }
+            .ui({}, {})
     }
 }

@@ -1,4 +1,9 @@
 <resources>
+    <string-array name="tabs_mode">
+        <item>Хорошее</item>
+        <item>Лучшее</item>
+        <item>Новое</item>
+    </string-array>
     <string name="add_tag">Добавить тег</string>
     <string name="profile">Профиль</string>
     <string name="settings">Настройки</string>
@@ -29,8 +34,8 @@
     <string name="open">Open</string>
     <string name="write_feedback">Напишите отзыв</string>
     <string name="error_email_client_not_installed">У вас не установлен почтовый клиент.</string>
-    <string name="unknow_error">Произошла ошибка. Пожалуйста, попробуйте позже.</string>
-    <string name="unknown_error">Произошла ошибка. Пожалуйста, попробуйте позже.</string>
+    <string name="unknow_error">Произошла ошибка.\nПожалуйста, попробуйте позже.</string>
+    <string name="unknown_error">Произошла ошибка.\nПожалуйста, попробуйте позже.</string>
     <string name="authorization">Авторизация</string>
     <string name="get_profile">Загрузка профиля</string>
     <string name="write_comment">Write comment</string>
@@ -77,4 +82,5 @@
     <string name="do_you_want_to_like_dislike_this_post">Хотите оценить этот пост?</string>
     <string name="dislike">Минус</string>
     <string name="like">Плюс</string>
+    <string name="top_comments">Лучшие комментарии</string>
 </resources>

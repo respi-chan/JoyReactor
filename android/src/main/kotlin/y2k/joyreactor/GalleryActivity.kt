@@ -7,22 +7,24 @@ import android.view.View
 import y2k.joyreactor.common.*
 import y2k.joyreactor.model.Image
 import y2k.joyreactor.viewmodel.GalleryViewModel
+import y2k.joyreactor.widget.WebImageView
 
 /**
  * Created by y2k on 2/7/16.
  */
-class GalleryActivity : AppCompatActivity() {
+class GalleryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
-        setSupportActionBar(find<Toolbar>(R.id.toolbar))
 
         val vm = ServiceLocator.resolve<GalleryViewModel>()
         bindingBuilder(this) {
             recyclerView(R.id.list, vm.images) {
                 viewHolder {
-                    VH(it.inflate(R.layout.item_image))
+                    VH(it.inflate(R.layout.item_image)).apply {
+                        setOnClick(R.id.image) { vm.openImage(it) }
+                    }
                 }
             }
         }

@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import y2k.joyreactor.common.PartialResult
 import y2k.joyreactor.common.ioObservable
-import y2k.joyreactor.common.await
+import y2k.joyreactor.common.ui
 import java.io.File
 import kotlin.properties.Delegates
 
@@ -45,9 +45,16 @@ class ProgressImageView(context: Context?, attrs: AttributeSet?) :
                     op.outHeight / met.heightPixels)
 
                 BitmapFactory.decodeFile(file.absolutePath, op)
-            }.await {
+            }.ui {
                 imageView.setImageBitmap(it)
             }
+        }
+    }
+
+    fun setImage(img: File?) {
+        image = when (img) {
+            null -> PartialResult.inProgress(0)
+            else -> PartialResult.complete(img)
         }
     }
 
