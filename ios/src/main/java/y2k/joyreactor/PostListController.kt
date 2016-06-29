@@ -8,7 +8,7 @@ import y2k.joyreactor.common.setImageLink
 import y2k.joyreactor.generated.PostCell
 import y2k.joyreactor.generated.PostListViewController
 import y2k.joyreactor.services.LifeCycleService
-import y2k.joyreactor.viewmodel.PostListViewModel
+import y2k.joyreactor.viewmodel.MainViewModel
 
 /**
  * Created by y2k on 5/11/16.
@@ -22,7 +22,7 @@ class PostListController(controller: PostListViewController) {
         controller.apply {
             SideMenu(this, "Menu").attach()
 
-            val vm = ServiceLocator.resolve<PostListViewModel>(lifeCycle)
+            val vm = ServiceLocator.resolve<MainViewModel>(lifeCycle)
             BindingBuilder {
                 activityIndicator(progressView, vm.isBusy)
                 tableView(list, vm.posts) {

@@ -8,15 +8,30 @@ import ios.foundation.c.Foundation
 import ios.foundation.enums.NSSearchPathDirectory
 import ios.foundation.enums.NSSearchPathDomainMask
 import ios.uikit.UIImage
-import rx.Observable
+import rx.Completable
+import rx.Single
 import rx.schedulers.Schedulers
 import y2k.joyreactor.common.ForegroundScheduler
+import y2k.joyreactor.services.ReportService
 import java.io.File
 
 /**
  * Created by y2k on 5/11/16.
  */
 class IosPlatform : Platform {
+
+    override fun makeReportService(): ReportService {
+        return object : ReportService {
+
+            override fun createFeedback() {
+                throw UnsupportedOperationException()
+            }
+        }
+    }
+
+    override fun createTmpThumbnail(videoFile: File): Single<File> {
+        throw UnsupportedOperationException()
+    }
 
     init {
         ForegroundScheduler.instance = Schedulers.from { action ->
@@ -44,7 +59,7 @@ class IosPlatform : Platform {
         throw UnsupportedOperationException()
     }
 
-    override fun saveToGallery(imageFile: File): Observable<*> {
+    override fun saveToGallery(imageFile: File): Completable {
         throw UnsupportedOperationException()
     }
 
