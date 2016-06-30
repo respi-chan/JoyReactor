@@ -1,5 +1,7 @@
 package y2k.joyreactor.common
 
+import com.intel.moe.natj.objc.SEL
+import com.intel.moe.natj.objc.ann.Selector
 import ios.uikit.*
 
 /**
@@ -34,7 +36,10 @@ class SideMenu(private val parent: UIViewController, menuStoryboardId: String) {
     fun attach() {
         val menuButton = UIBarButtonItem.alloc().init()
         menuButton.setImage(UIImage.imageNamed("MenuIcon.png"))
+
 //        menuButton.setOnClickListener { sender -> menuButtonClicked() }
+        menuButton.setTarget(this)
+        menuButton.setAction(SEL("menuButtonClicked"))
 
 //        parent.navigationItem.leftBarButtonItem = menuButton
 
@@ -44,7 +49,8 @@ class SideMenu(private val parent: UIViewController, menuStoryboardId: String) {
 //        parent.view.addGestureRecognizer(edgeGesture)
     }
 
-    internal fun menuButtonClicked() {
+    @Selector("menuButtonClicked")
+    fun menuButtonClicked() {
         if (menuView.superview() != null) return
 
         val menuFrame = parentView.frame()

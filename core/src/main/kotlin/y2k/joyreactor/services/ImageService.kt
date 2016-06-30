@@ -20,6 +20,12 @@ class ImageService(
     private val client: MultiTryDownloader,
     private val decoder: Platform) {
 
+    fun makeUrl(image: Image?, width: Int): String? {
+        if (image == null) return null
+        val height = width / image.getAspect(1f)
+        return image.thumbnailUrl(width, height.toInt())
+    }
+
     fun makeUrl(image: Image?, width: Int, height: Int): String? {
         return image?.thumbnailUrl(width, height)
     }
