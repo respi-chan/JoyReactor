@@ -1,7 +1,6 @@
 package y2k.joyreactor
 
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
 import android.view.ViewGroup
 import android.widget.TextView
 import y2k.joyreactor.common.*
@@ -46,7 +45,7 @@ class PostActivity : BaseActivity() {
             }
 
             visibility(R.id.error, vm.error)
-            visibility(R.id.progress, vm.isBusy)
+            snackbar(R.id.list, R.string.updating, vm.isBusy)
 
             menu(R.menu.menu_post) {
                 command(R.id.saveImageToGallery) { vm.saveToGallery() }
@@ -75,8 +74,8 @@ class PostActivity : BaseActivity() {
             rating.text = "" + item.rating
             replies.text = "" + item.replies
 
-            attachment.setVisible(item.attachmentObject != null)
-            attachment.image = item.attachmentObject
+            attachment.setVisible(item.attachment != null)
+            attachment.image = item.attachment
         }
     }
 }
