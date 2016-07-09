@@ -7,7 +7,6 @@ import y2k.joyreactor.common.platform.NavigationService
 import y2k.joyreactor.common.platform.Platform
 import y2k.joyreactor.services.*
 import y2k.joyreactor.services.images.DiskCache
-import y2k.joyreactor.services.images.MultiTryDownloader
 import y2k.joyreactor.services.repository.Entities
 import y2k.joyreactor.services.repository.IDataContext
 import y2k.joyreactor.services.repository.ormlite.OrmLiteDataContext
@@ -52,7 +51,7 @@ object ServiceLocator {
         register { TagsForUserRequest(resolve(), resolve()) }
         register { OriginalImageRequestFactory(resolve(), resolve()) }
         register { PostRequest(resolve(), resolve<PostParser>()) }
-        register { ProfileRequestFactory(resolve()) }
+        register { ProfileRequest(resolve()) }
         register { LoginRequestFactory(resolve()) }
         register { SendMessageRequest(resolve()) }
         register { CreateCommentRequest(resolve()) }
@@ -60,7 +59,7 @@ object ServiceLocator {
         register { PostService(resolve(), resolve<PostRequest>(), resolve(), resolve(), resolve(), resolve(), resolve()) }
         register { TagService(resolve(), resolve(), resolve(), resolve()) }
         register { UserService(resolve(), resolve(), resolve(), resolve()) }
-        register { ProfileService(resolve(), resolve(), resolve()) }
+        register { ProfileService(resolve(), resolve<ProfileRequest>(), resolve<UserNameRequest>(), resolve()) }
         register { UserMessagesService(resolve(), resolve(), resolve()) }
         register { CommentService(resolve<CreateCommentRequest>(), resolve()) }
 
@@ -77,8 +76,7 @@ object ServiceLocator {
         register { CommentsViewModel(resolve(), resolve(), resolve(), resolve()) }
 
         register { DiskCache(resolve()) }
-        register { MultiTryDownloader(resolve()) }
-        register { ImageService(resolve(), resolve(), resolve()) }
+        register { ImageService(resolve(), resolve(), resolve(), resolve()) }
 
         registerSingleton<IDataContext> { OrmLiteDataContext(resolve()) }
         register { Entities(resolve()) }

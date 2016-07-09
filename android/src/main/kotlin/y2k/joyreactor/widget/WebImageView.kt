@@ -7,14 +7,13 @@ import android.util.AttributeSet
 import android.widget.ImageView
 import y2k.joyreactor.common.ServiceLocator
 import y2k.joyreactor.model.Image
-import y2k.joyreactor.services.LinksPool
 import y2k.joyreactor.services.ImageService
 import kotlin.properties.Delegates
 
 /**
  * Created by y2k on 9/26/15.
  */
-class WebImageView(context: Context, attrs: AttributeSet) : ImageView(context, attrs) {
+class WebImageView(context: Context?, attrs: AttributeSet? = null) : ImageView(context, attrs) {
 
     val imageService = ServiceLocator.resolve<ImageService>()
     var image by Delegates.observable(null as Image?) { prop, old, new -> invalidate() }
@@ -29,7 +28,7 @@ class WebImageView(context: Context, attrs: AttributeSet) : ImageView(context, a
             state = ImageState(image, canvas.width, canvas.height)
 
             val url = imageService.makeUrl(state.image, state.width, state.height)
-            imageService.to<Bitmap>(LinksPool.default, url, this).subscribe { setImageBitmap(it) }
+            imageService.to<Bitmap>(url, this).subscribe { setImageBitmap(it) }
         }
     }
 
